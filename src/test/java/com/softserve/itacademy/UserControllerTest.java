@@ -92,7 +92,6 @@ public class UserControllerTest {
                 .andExpect(redirectedUrl("/todos/all/users/" + testUser.getId()));
     }
 
-
     @Test
     void postCreateUserWithBindingResultErrors()throws Exception{
 
@@ -104,7 +103,6 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
 
     }
-
     @Test
     public void testDeleteUser() throws Exception {
         mockMvc.perform(get("/users/{id}/delete", 4)
@@ -112,8 +110,6 @@ public class UserControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/users/all"));
     }
-
-
 
     @Test
     void getUserUpdate() throws Exception{
@@ -128,6 +124,5 @@ public class UserControllerTest {
                 .andExpect(model().attribute("roles", roleService.getAll()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("update-user"));
-        ;
     }
 }
