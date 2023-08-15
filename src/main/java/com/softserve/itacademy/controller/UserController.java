@@ -3,6 +3,8 @@ package com.softserve.itacademy.controller;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.service.RoleService;
 import com.softserve.itacademy.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/users")
 public class UserController {
+
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
     private final RoleService roleService;
@@ -80,6 +84,7 @@ public class UserController {
 
     @GetMapping("/all")
     public String getAll(Model model) {
+        logger.info("Get all users");
         model.addAttribute("users", userService.getAll());
         return "users-list";
     }
