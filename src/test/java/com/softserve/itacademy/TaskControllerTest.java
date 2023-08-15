@@ -75,7 +75,6 @@ public class TaskControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isFound())
                 .andExpect(MockMvcResultMatchers.model().hasNoErrors())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/todos/5/tasks"));
-
     }
 
     @Test
