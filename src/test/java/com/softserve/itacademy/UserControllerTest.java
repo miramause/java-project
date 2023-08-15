@@ -1,6 +1,7 @@
 package com.softserve.itacademy;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -15,6 +16,7 @@ import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.service.RoleService;
 import com.softserve.itacademy.service.UserService;
 
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,19 +95,31 @@ public class UserControllerTest {
     }
 
     @Test
-    void postCreateUserWithBindingResultErrors()throws Exception{
+    void postCreateUserWithBindingResultErrorsTest()throws Exception{
 
         testUser.setLastName("");
 
         mockMvc.perform(post( "/users/create")
                         .flashAttr("user", testUser))
                 .andExpect(model().hasErrors())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("create-user"));
 
     }
+
     @Test
-    public void testDeleteUser() throws Exception {
-        mockMvc.perform(get("/users/{id}/delete", 4)
+    void getReadUserTest() throws Exception {
+        when(userService.readById(anyLong())).thenReturn(testUser);
+
+        mockMvc.perform(get("/users/{id}/read", testUser.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user-info"));
+    }
+
+    @Test
+    public void getDeleteUserTest() throws Exception {
+        mockMvc.perform(get("/users/{id}/delete", testUser.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/users/all"));
@@ -116,13 +130,28 @@ public class UserControllerTest {
 
         Mockito.doReturn(testUser)
                 .when(userService)
-                .readById(4);
+                .readById(testUser.getId());
 
-        mockMvc.perform(get("/users/{id}/update",4)
+        mockMvc.perform(get("/users/{id}/update",testUser.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attribute("roles", roleService.getAll()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("update-user"));
+    }
+
+    @Test
+    void postUpdateUserTest() throws Exception {
+        List<Role> roles = Arrays.asList();
+        when(userService.readById(anyLong())).thenReturn(testUser);
+        when(roleService.getAll()).thenReturn(roles);
+
+
+        mockMvc.perform(post("/users/{id}/update",testUser.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .flashAttr("user", testUser)
+                        .param("roleId", String.valueOf(testUser.getRole().getId())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/" + testUser.getId() + "/read"));
     }
 }
